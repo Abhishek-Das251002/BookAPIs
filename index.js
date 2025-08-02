@@ -3,6 +3,16 @@ const Book = require("./books.model")
 
 const express = require("express")
 const app = express()
+
+const cors = require("cors");
+const corsOptions = {
+  origin: "*",
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json())
 
 makeDbConnection()
@@ -40,7 +50,7 @@ app.get("/books", async (req, res) => {
     try{
         const allAvailableBooks = await readAll()
         if(allAvailableBooks.length != 0){
-            res.status(200).json({availableBooks: allAvailableBooks})
+            res.status(200).json(allAvailableBooks)
         }else{
             res.status(404).json({error: "books not found."})
         }
@@ -62,7 +72,7 @@ app.get("/books/:booktitle", async (req, res) => {
     try{
         const expectedBook = await readByTitle(req.params.booktitle)
         if(expectedBook){
-            res.status(200).json({message: "book with given title", expectedBook})
+            res.status(200).json(expectedBook)
         }else{
             res.status(404).json({error: "book not found."})
         }
@@ -85,7 +95,7 @@ app.get("/books/authors/:selectedAuthor", async (req, res) => {
     try{
         const authorBooks = await readByAuthor(req.params.selectedAuthor)
         if(authorBooks.length != 0){
-            res.status(200).json({message: "books by choosen author are:", authorBooks})
+            res.status(200).json(authorBooks)
         }else{
             res.status(404).json({error: "books not found."})
         }
@@ -209,7 +219,10 @@ app.delete("/books/:bookId", async (req, res) => {
         res.status(500).json({error: error.message})
     }
 })
+
+
 PORT = 3000
 app.listen(PORT, () => {
     console.log("server is running on port", PORT)
 })
+
